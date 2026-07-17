@@ -24,6 +24,8 @@ local Config = {
 	EventDropScanDelay = 0.1,
 	AutoRollJellyFish = false,
 	RollDelay = 1,
+	AutoRollUFO = false,
+	UFORollDelay = 1,
 }
 
 local Window
@@ -144,6 +146,20 @@ task.spawn(function()
 end)
 
 -- ============================================================
+--  AUTO OPEN UFO
+-- ============================================================
+task.spawn(function()
+	while true do
+		task.wait(Config.UFORollDelay)
+		if Config.AutoRollUFO and TokenRoll then
+			pcall(function()
+				TokenRoll:FireServer({ machine = "UFO" })
+			end)
+		end
+	end
+end)
+
+-- ============================================================
 --  AUTO COLLECT DOCK ORE
 -- ============================================================
 task.spawn(function()
@@ -251,6 +267,25 @@ EventTab:CreateSlider({
 	CurrentValue = Config.RollDelay,
 	Flag = "RollDelay",
 	Callback = function(v) Config.RollDelay = v end,
+})
+
+EventTab:CreateSection("UFO Machine")
+EventTab:CreateToggle({
+	Name = "Auto Open UFO",
+	Description = "Automatically rolls the UFO token machine",
+	Flag = "AutoRollUFO",
+	CurrentValue = Config.AutoRollUFO,
+	Callback = function(v) Config.AutoRollUFO = v end,
+})
+
+EventTab:CreateSlider({
+	Name = "Roll Delay",
+	Range = { 0.1, 5 },
+	Increment = 0.1,
+	Suffix = "s",
+	CurrentValue = Config.UFORollDelay,
+	Flag = "UFORollDelay",
+	Callback = function(v) Config.UFORollDelay = v end,
 })
 
 -- ── INFO TAB ─────────────────────────────────────────────
