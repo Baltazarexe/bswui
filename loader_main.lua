@@ -18,6 +18,7 @@ local BASE_URL = "https://raw.githubusercontent.com/Baltazarexe/bswui/main/"
 -- Mapping: PlaceId -> script (without .lua)
 local GAME_MAP = {
 	[79268393072444] = "lemon_bsw",      -- Lemon Tycoon
+	[121125129560252] = "mineworld_bsw", -- Mine World
 	-- [123456789] = "fish_bsw",          -- Fishing Simulator (example)
 	-- [987654321] = "slime_bsw",         -- Slime Farm (example)
 	-- [111111111] = "sw_bsw",            -- Sword Warriors (example)
@@ -42,7 +43,7 @@ local scriptContent
 
 -- Try HttpGet first (hosted on internet)
 local ok = pcall(function()
-	if typeof(game:HttpGet) == "function" then
+	if typeof(game.HttpGet) == "function" then
 		scriptContent = game:HttpGet(scriptUrl)
 	end
 end)
