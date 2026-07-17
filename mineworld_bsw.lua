@@ -177,26 +177,6 @@ Window = Veil.CreateWindow({
 
 -- ── MAIN TAB ─────────────────────────────────────────────
 local MainTab = Window:CreateTab("Main")
-MainTab:CreateButton({
-	Name = "Join Discord",
-	Description = "Copy Discord invite link",
-	Callback = function()
-		if typeof(setclipboard) == "function" then
-			setclipboard(DISCORD_LINK)
-			Window:Notify({ Title = "Copied!", Content = "Discord link copied to clipboard.", Type = "Success" })
-		end
-	end,
-})
-
-MainTab:CreateSection("General")
-MainTab:CreateKeybind({
-	Name = "Menu Toggle Key",
-	CurrentKeybind = "K",
-	Flag = "MenuToggleKey",
-	Callback = function(key)
-		Window:SetToggleKey(key)
-	end,
-})
 
 MainTab:CreateSection("Dock Ore")
 MainTab:CreateToggle({
@@ -204,26 +184,6 @@ MainTab:CreateToggle({
 	Flag = "AutoCollect",
 	CurrentValue = Config.AutoCollect,
 	Callback = function(v) Config.AutoCollect = v end,
-})
-
-MainTab:CreateSection("Event Drops")
-MainTab:CreateToggle({
-	Name = "Auto Collect Event Drops",
-	Description = "Teleports to FS_EventDropBall drops to collect them",
-	Flag = "AutoEventDrop",
-	CurrentValue = Config.AutoEventDrop,
-	Callback = function(v) Config.AutoEventDrop = v end,
-})
-
-MainTab:CreateSlider({
-	Name = "TP Speed",
-	Description = "Delay between each teleport to a drop",
-	Range = { 0.05, 2 },
-	Increment = 0.05,
-	Suffix = "s",
-	CurrentValue = Config.EventDropScanDelay,
-	Flag = "EventDropScanDelay",
-	Callback = function(v) Config.EventDropScanDelay = v end,
 })
 
 MainTab:CreateSection("Selling")
@@ -235,11 +195,54 @@ MainTab:CreateToggle({
 	Callback = function(v) Config.AutoSell = v end,
 })
 
+-- ── EVENT TAB ────────────────────────────────────────────
+local EventTab = Window:CreateTab("Event")
+EventTab:CreateSection("Event Drops")
+EventTab:CreateToggle({
+	Name = "Auto Collect Event Drops",
+	Description = "Teleports to FS_EventDropBall drops to collect them",
+	Flag = "AutoEventDrop",
+	CurrentValue = Config.AutoEventDrop,
+	Callback = function(v) Config.AutoEventDrop = v end,
+})
+
+EventTab:CreateSlider({
+	Name = "TP Speed",
+	Description = "Delay between each teleport to a drop",
+	Range = { 0.05, 2 },
+	Increment = 0.05,
+	Suffix = "s",
+	CurrentValue = Config.EventDropScanDelay,
+	Flag = "EventDropScanDelay",
+	Callback = function(v) Config.EventDropScanDelay = v end,
+})
+
 -- ── INFO TAB ─────────────────────────────────────────────
 local InfoTab = Window:CreateTab("Info")
 InfoTab:CreateParagraph({
 	Title = "BSW Hub - Mine World",
 	Content = "Automatic script for Mine World. Configure options above.",
+})
+
+InfoTab:CreateSection("General")
+InfoTab:CreateKeybind({
+	Name = "Menu Toggle Key",
+	CurrentKeybind = "K",
+	Flag = "MenuToggleKey",
+	Callback = function(key)
+		Window:SetToggleKey(key)
+	end,
+})
+
+InfoTab:CreateButton({
+	Name = "Join Discord",
+	Description = "Copy Discord invite link",
+	Callback = function()
+		if typeof(setclipboard) == "function" then
+			setclipboard(DISCORD_LINK)
+			Window:Notify({ Title = "Copied!", Content = "Discord link copied to clipboard.", Type = "Success" })
+		end
+	end,
 })
 
 InfoTab:CreateDivider()
