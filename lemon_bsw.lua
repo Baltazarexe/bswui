@@ -1,14 +1,14 @@
 -- ============================================================
 --  BSW HUB - AUTO LEMON (VeilUI v2.2)
---  feito por baltazar.exe
---  migrate: usa VeilUI em vez de Rayfield
+--  made by baltazar.exe
+--  migrate: use VeilUI instead of Rayfield
 -- ============================================================
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 
--- stands disponiveis em workspace.<tycoon>.Purchases
+-- stands available in workspace.<tycoon>.Purchases
 local STANDS = {
 	"Minigames", "LemonDash", "LemonX Ground", "Staircase", "Lemon Stand",
 	"Lemon Labs", "LemonX", "Lemon Republic", "Lemon Depot", "Lemon Robotics",
@@ -169,7 +169,7 @@ local function getUpgradeRemote(standName)
 end
 
 -- ============================================================
---  CASH / PRICE HELPERS (mesma coisa do original)
+--  CASH / PRICE HELPERS
 -- ============================================================
 local WORD_MULT = {
 	thousand=1e3, million=1e6, billion=1e9, trillion=1e12,
@@ -717,16 +717,16 @@ task.spawn(function()
 end)
 
 -- ============================================================
---  UI VEIL (NOVO)
+--  UI VEIL
 -- ============================================================
--- Carrega VeilUI via GitHub
+-- Load VeilUI from GitHub
 local Veil
 local ok = pcall(function()
 	Veil = loadstring(game:HttpGet("https://raw.githubusercontent.com/Baltazarexe/bswui/main/uilib.lua"))()
 end)
 
 if not ok or not Veil then
-	warn("[BSW] VeilUI nao carregou")
+	warn("[BSW] VeilUI failed to load")
 	return
 end
 
@@ -747,11 +747,11 @@ local Window = Veil.CreateWindow({
 local MainTab = Window:CreateTab("Main")
 MainTab:CreateButton({
 	Name = "Join Discord",
-	Description = "Copiar convite do Discord",
+	Description = "Copy Discord invite link",
 	Callback = function()
 		if typeof(setclipboard) == "function" then
 			setclipboard(DISCORD_LINK)
-			Window:Notify({ Title = "Copiado!", Content = "Link do Discord copiado.", Type = "Success" })
+			Window:Notify({ Title = "Copied!", Content = "Discord link copied to clipboard.", Type = "Success" })
 		end
 	end,
 })
@@ -759,10 +759,10 @@ MainTab:CreateButton({
 MainTab:CreateSection("Status")
 MainTab:CreateLabel("Tycoon: " .. (MyTycoon and MyTycoon.Name or "DETECTING..."))
 
-MainTab:CreateSection("Gerais")
+MainTab:CreateSection("General")
 MainTab:CreateToggle({
 	Name = "Auto Wake (all stands)",
-	Description = "Desperta todos os stands automaticamente",
+	Description = "Automatically wake all stands",
 	Flag = "AutoLemon",
 	CurrentValue = Config.AutoLemon,
 	Callback = function(v) Config.AutoLemon = v end,
@@ -770,7 +770,7 @@ MainTab:CreateToggle({
 
 MainTab:CreateToggle({
 	Name = "Auto Accept Phone Offers",
-	Description = "Aceita ofertas do telefone",
+	Description = "Accept phone offers automatically",
 	Flag = "AutoAcceptOffers",
 	CurrentValue = Config.AutoAcceptOffers,
 	Callback = function(v) Config.AutoAcceptOffers = v end,
@@ -785,7 +785,7 @@ MainTab:CreateToggle({
 
 MainTab:CreateToggle({
 	Name = "Auto Rejoin",
-	Description = "Reconecta ao desconectar",
+	Description = "Rejoin when disconnected",
 	Flag = "AutoRejoin",
 	CurrentValue = Config.AutoRejoin,
 	Callback = function(v) Config.AutoRejoin = v end,
@@ -793,7 +793,7 @@ MainTab:CreateToggle({
 
 MainTab:CreateToggle({
 	Name = "Auto Click Fruits",
-	Description = "Coleta frutas automaticamente",
+	Description = "Collect fruits automatically",
 	Flag = "AutoClickFruits",
 	CurrentValue = Config.AutoClickFruits,
 	Callback = function(v) Config.AutoClickFruits = v end,
@@ -810,11 +810,11 @@ MainTab:CreateSlider({
 })
 
 -- ── AUTO CASH TAB ────────────────────────────────────────
-local CashTab = Window:CreateTab("Auto Cash")
+local CashTab = Window:CreateTab("Cash")
 CashTab:CreateSection("Cash Drops")
 CashTab:CreateToggle({
 	Name = "Auto TP Cash Drops",
-	Description = "TP automatico para drops de cash",
+	Description = "Automatically teleport to cash drops",
 	Flag = "AutoCashTP",
 	CurrentValue = Config.AutoCashTP,
 	Callback = function(v) Config.AutoCashTP = v end,
@@ -855,7 +855,7 @@ local PurchaseTab = Window:CreateTab("Purchase")
 PurchaseTab:CreateSection("Items")
 PurchaseTab:CreateToggle({
 	Name = "Auto Purchase Items",
-	Description = "Toca botoes de compra automaticamente",
+	Description = "Click purchase buttons automatically",
 	Flag = "AutoPurchase",
 	CurrentValue = Config.AutoPurchase,
 	Callback = function(v) Config.AutoPurchase = v end,
@@ -904,10 +904,10 @@ RebirthTab:CreateSlider({
 local InfoTab = Window:CreateTab("Info")
 InfoTab:CreateParagraph({
 	Title = "BSW Hub - Lemon Tycoon",
-	Content = "Script automático para Lemon Tycoon. Configure as opções nas abas ao lado.",
+	Content = "Automatic script for Lemon Tycoon. Configure options in the tabs above.",
 })
 
 InfoTab:CreateDivider()
 InfoTab:CreateLabel("v2.2 | BSW UI")
 
-Window:Notify({ Title = "Carregado", Content = "BSW Lemon iniciado com sucesso.", Type = "Success" })
+Window:Notify({ Title = "Loaded", Content = "BSW Lemon started successfully.", Type = "Success" })
