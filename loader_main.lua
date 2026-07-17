@@ -1,56 +1,56 @@
 -- ============================================================
 --  BSW HUB - MAIN LOADER
---  Detecta o PlaceId do jogo e carrega o script correto
+--  Detect game PlaceId and load the correct script
 --
---  COMO USAR:
---  1. Cole este script inteiro no executor (Wave, Synapse, etc)
---  2. Ele automaticamente detecta qual jogo voce esta e carrega o script
---  3. Configuracoes sao salvas localmente em VeilUI/config
+--  HOW TO USE:
+--  1. Paste this entire script into your executor (Wave, Synapse, etc)
+--  2. It automatically detects which game you are in and loads the script
+--  3. Settings are saved locally in VeilUI/config
 --
---  HOSPEDAGEM:
---  Altere o BASE_URL abaixo para apontar pro seu site
+--  HOSTING:
+--  Change the BASE_URL below to point to your site
 --  Ex: https://baltasoftware.com/scripts/
 -- ============================================================
 
--- URL base GitHub raw
+-- GitHub raw base URL
 local BASE_URL = "https://raw.githubusercontent.com/Baltazarexe/bswui/main/"
 
--- Mapeamento: PlaceId -> script (sem .lua)
+-- Mapping: PlaceId -> script (without .lua)
 local GAME_MAP = {
 	[79268393072444] = "lemon_bsw",      -- Lemon Tycoon
-	-- [123456789] = "fish_bsw",          -- Fishing Simulator (exemplo)
-	-- [987654321] = "slime_bsw",         -- Slime Farm (exemplo)
-	-- [111111111] = "sw_bsw",            -- Sword Warriors (exemplo)
-	-- adicione mais jogos aqui
+	-- [123456789] = "fish_bsw",          -- Fishing Simulator (example)
+	-- [987654321] = "slime_bsw",         -- Slime Farm (example)
+	-- [111111111] = "sw_bsw",            -- Sword Warriors (example)
+	-- add more games here
 }
 
 local PlaceId = tostring(game.PlaceId)
 local scriptName = GAME_MAP[tonumber(PlaceId)]
 
 if not scriptName then
-	warn("[BSW] PlaceId nao encontrado: " .. PlaceId)
-	warn("[BSW] Jogos disponiveis:")
+	warn("[BSW] PlaceId not found: " .. PlaceId)
+	warn("[BSW] Available games:")
 	for pid, name in pairs(GAME_MAP) do
 		warn("  " .. pid .. " -> " .. name)
 	end
 	return
 end
 
--- Tenta carregar do site (hospedado) ou fallback para arquivo local
+-- Try to load from site (hosted) or fallback to local file
 local scriptUrl = BASE_URL .. scriptName .. ".lua"
 local scriptContent
 
--- Tenta HttpGet primeiro (hospedado na internet)
+-- Try HttpGet first (hosted on internet)
 local ok = pcall(function()
 	if typeof(game:HttpGet) == "function" then
 		scriptContent = game:HttpGet(scriptUrl)
 	end
 end)
 
--- Fallback: tenta arquivo local se HttpGet falhar
+-- Fallback: try local file if HttpGet fails
 if not ok or not scriptContent then
-	warn("[BSW] Nao conseguiu carregar de " .. scriptUrl)
-	warn("[BSW] Tentando carregar arquivo local: " .. scriptName .. ".lua")
+	warn("[BSW] Failed to load from " .. scriptUrl)
+	warn("[BSW] Trying to load local file: " .. scriptName .. ".lua")
 
 	pcall(function()
 		scriptContent = readfile(scriptName .. ".lua")
@@ -58,18 +58,18 @@ if not ok or not scriptContent then
 end
 
 if not scriptContent then
-	warn("[BSW] ERRO: nao conseguiu carregar o script de forma alguma")
-	warn("[BSW] Certifique-se que o arquivo existe no site ou na pasta local")
+	warn("[BSW] ERROR: Could not load script from any source")
+	warn("[BSW] Make sure the file exists on the site or in the local folder")
 	return
 end
 
--- Executa o script
-local ok, err = pcall(function()
+-- Execute the script
+local success, err = pcall(function()
 	loadstring(scriptContent)()
 end)
 
-if not ok then
-	warn("[BSW] ERRO ao executar script: " .. tostring(err))
+if not success then
+	warn("[BSW] ERROR executing script: " .. tostring(err))
 else
-	print("[BSW] Script carregado com sucesso!")
+	print("[BSW] Script loaded successfully!")
 end
