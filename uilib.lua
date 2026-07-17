@@ -12,7 +12,7 @@
 			Transparency = 0.08,       -- 0 = solid, higher = more glass
 			Blur = false,              -- optional frosted-glass blur (off by default)
 			HideName = false,          -- hide the display name/username in the sidebar card
-			ToggleKey = Enum.KeyCode.RightShift,
+			ToggleKey = Enum.KeyCode.K,
 			ConfigurationSaving = { Enabled = true, FolderName = "VeilUI", FileName = "config" },
 		})
 		local Tab = Window:CreateTab("Main")
@@ -21,6 +21,7 @@
 		Window:SetTheme("Light")       -- live switch
 		Window:SetTransparency(0.2)    -- live glass amount
 		Window:SetNameHidden(true)     -- live switch, hides sidebar name/username
+		Window:SetToggleKey(Enum.KeyCode.K) -- live switch, or pass a KeyCode.Name string
 ]]
 
 local UserInputService = game:GetService("UserInputService")
@@ -241,7 +242,7 @@ function Veil.CreateWindow(opts)
 	opts = opts or {}
 	local title = opts.Title or "Veil UI"
 	local subtitle = opts.Subtitle or ""
-	local toggleKey = opts.ToggleKey or Enum.KeyCode.RightShift
+	local toggleKey = opts.ToggleKey or Enum.KeyCode.K
 	local blurEnabled = opts.Blur == true -- blur is opt-in (off by default)
 
 	-- ── live theme system ────────────────────────────────────────────
@@ -644,6 +645,14 @@ function Veil.CreateWindow(opts)
 	function Window:SetNameHidden(hidden)
 		nameHidden = hidden == true
 		applyNameHidden()
+	end
+
+	function Window:SetToggleKey(keyCode)
+		if typeof(keyCode) == "EnumItem" then
+			toggleKey = keyCode
+		elseif typeof(keyCode) == "string" and Enum.KeyCode[keyCode] then
+			toggleKey = Enum.KeyCode[keyCode]
+		end
 	end
 
 	local notifyOrder = 0

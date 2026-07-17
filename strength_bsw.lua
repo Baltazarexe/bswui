@@ -179,7 +179,7 @@ Window = Veil.CreateWindow({
 	Transparency = 0.06,
 	Blur = false,
 	HideName = false,
-	ToggleKey = Enum.KeyCode.RightShift,
+	ToggleKey = Enum.KeyCode.K,
 	ConfigurationSaving = { Enabled = true, FolderName = "BSWHub", FileName = "StrengthConfig" },
 })
 
@@ -246,6 +246,15 @@ MainTab:CreateSlider({
 })
 
 MainTab:CreateSection("General")
+MainTab:CreateKeybind({
+	Name = "Menu Toggle Key",
+	CurrentKeybind = "K",
+	Flag = "MenuToggleKey",
+	Callback = function(key)
+		Window:SetToggleKey(key)
+	end,
+})
+
 MainTab:CreateToggle({
 	Name = "Hide Popups",
 	Description = "Hides the +Power flytext, SPIN wheel and x2 target icon",

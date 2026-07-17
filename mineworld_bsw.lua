@@ -107,7 +107,7 @@ Window = Veil.CreateWindow({
 	Transparency = 0.06,
 	Blur = false,
 	HideName = false,
-	ToggleKey = Enum.KeyCode.RightShift,
+	ToggleKey = Enum.KeyCode.K,
 	ConfigurationSaving = { Enabled = true, FolderName = "BSWHub", FileName = "MineWorldConfig" },
 })
 
@@ -121,6 +121,16 @@ MainTab:CreateButton({
 			setclipboard(DISCORD_LINK)
 			Window:Notify({ Title = "Copied!", Content = "Discord link copied to clipboard.", Type = "Success" })
 		end
+	end,
+})
+
+MainTab:CreateSection("General")
+MainTab:CreateKeybind({
+	Name = "Menu Toggle Key",
+	CurrentKeybind = "K",
+	Flag = "MenuToggleKey",
+	Callback = function(key)
+		Window:SetToggleKey(key)
 	end,
 })
 
