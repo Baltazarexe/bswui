@@ -719,16 +719,10 @@ end)
 -- ============================================================
 --  UI VEIL (NOVO)
 -- ============================================================
--- Carrega VeilUI via HttpGet ou readfile
+-- Carrega VeilUI via GitHub
 local Veil
 local ok = pcall(function()
-	if typeof(game:HttpGet) == "function" then
-		-- Opção A: hospedado na internet (mudar URL pro seu site)
-		Veil = loadstring(game:HttpGet("https://baltasoftware.com/scripts/obfuscated/uilib.lua"))()
-	else
-		-- Opção B: arquivo local (desenvolvimento)
-		Veil = loadstring(readfile("uilib.lua"))()
-	end
+	Veil = loadstring(game:HttpGet("https://raw.githubusercontent.com/Baltazarexe/bswui/main/uilib.lua"))()
 end)
 
 if not ok or not Veil then

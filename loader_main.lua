@@ -12,9 +12,8 @@
 --  Ex: https://baltasoftware.com/scripts/
 -- ============================================================
 
--- URL base onde os scripts estao hospedados
--- Mude para o seu site/CDN: https://seu-site.com/scripts/
-local BASE_URL = "https://baltasoftware.com/scripts/"
+-- URL base GitHub raw
+local BASE_URL = "https://raw.githubusercontent.com/Baltazarexe/bswui/main/"
 
 -- Mapeamento: PlaceId -> script (sem .lua)
 local GAME_MAP = {
