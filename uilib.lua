@@ -195,19 +195,28 @@ local function makeDraggable(dragTarget, moveTarget)
 			dragging = true
 			dragStart = input.Position
 			startPos = moveTarget.Position
-			input.Changed:Connect(function()
+			local endedConn
+			endedConn = input.Changed:Connect(function()
 				if input.UserInputState == Enum.UserInputState.End then
 					dragging = false
+					endedConn:Disconnect()
 				end
 			end)
 		end
 	end)
 
-	dragTarget.InputChanged:Connect(function(input)
+	-- listen globally (not scoped to dragTarget) so fast drags that move the
+	-- cursor outside the title bar's bounds don't get stuck mid-drag
+	UserInputService.InputChanged:Connect(function(input)
+		if not dragging then return end
 		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-			if dragging then
-				moveTo(input.Position - dragStart)
-			end
+			moveTo(input.Position - dragStart)
+		end
+	end)
+
+	UserInputService.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = false
 		end
 	end)
 end
