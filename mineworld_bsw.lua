@@ -19,6 +19,8 @@ local Config = {
 	DockMax = 22,
 	AutoSell = false,
 	SellDelay = 1,
+	AutoEventDrop = false,
+	EventDropScanDelay = 0.1,
 }
 
 local Window
@@ -59,6 +61,68 @@ task.spawn(function()
 			end
 		end
 		task.wait(Config.SellDelay)
+	end
+end)
+
+-- ============================================================
+--  AUTO COLLECT EVENT DROPS
+-- ============================================================
+-- Event drop balls spawn under workspace.FarmStarClient.FS_EventDropVisuals
+-- as children named FS_EventDropBall. Collected by touching them, same as
+-- the cash drops pattern.
+local function getRoot()
+	local char = LocalPlayer.Character
+	if not char then return nil end
+	return char:FindFirstChild("HumanoidRootPart")
+end
+
+local function tpToEventDrop(drop)
+	if not drop or not drop.Parent then return end
+	local root = getRoot()
+	if not root then return end
+	local pos
+	if drop:IsA("BasePart") then
+		pos = drop.Position
+	elseif drop:IsA("Model") then
+		local pp = drop.PrimaryPart or drop:FindFirstChildWhichIsA("BasePart")
+		if pp then pos = pp.Position end
+	end
+	if not pos then return end
+	root.CFrame = CFrame.new(pos)
+	if typeof(firetouchinterest) == "function" then
+		local part = drop:IsA("BasePart") and drop or drop:FindFirstChildWhichIsA("BasePart", true)
+		if part then
+			firetouchinterest(root, part, 0)
+			firetouchinterest(root, part, 1)
+		end
+	end
+end
+
+task.spawn(function()
+	local farmStarClient = workspace:WaitForChild("FarmStarClient", 15)
+	local dropVisuals = farmStarClient and farmStarClient:WaitForChild("FS_EventDropVisuals", 15)
+	if not dropVisuals then
+		warn("[BSW] FS_EventDropVisuals not found")
+		return
+	end
+
+	dropVisuals.ChildAdded:Connect(function(drop)
+		task.wait(0.05)
+		if Config.AutoEventDrop then
+			tpToEventDrop(drop)
+		end
+	end)
+
+	while true do
+		task.wait(Config.EventDropScanDelay)
+		if Config.AutoEventDrop then
+			for _, drop in ipairs(dropVisuals:GetChildren()) do
+				if drop.Name == "FS_EventDropBall" then
+					tpToEventDrop(drop)
+					task.wait(Config.EventDropScanDelay)
+				end
+			end
+		end
 	end
 end)
 
@@ -140,6 +204,26 @@ MainTab:CreateToggle({
 	Flag = "AutoCollect",
 	CurrentValue = Config.AutoCollect,
 	Callback = function(v) Config.AutoCollect = v end,
+})
+
+MainTab:CreateSection("Event Drops")
+MainTab:CreateToggle({
+	Name = "Auto Collect Event Drops",
+	Description = "Teleports to FS_EventDropBall drops to collect them",
+	Flag = "AutoEventDrop",
+	CurrentValue = Config.AutoEventDrop,
+	Callback = function(v) Config.AutoEventDrop = v end,
+})
+
+MainTab:CreateSlider({
+	Name = "TP Speed",
+	Description = "Delay between each teleport to a drop",
+	Range = { 0.05, 2 },
+	Increment = 0.05,
+	Suffix = "s",
+	CurrentValue = Config.EventDropScanDelay,
+	Flag = "EventDropScanDelay",
+	Callback = function(v) Config.EventDropScanDelay = v end,
 })
 
 MainTab:CreateSection("Selling")
