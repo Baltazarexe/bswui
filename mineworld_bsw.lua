@@ -10,6 +10,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local Net = ReplicatedStorage:WaitForChild("Net", 10)
 local CollectDockOre = Net and Net:WaitForChild("RequestCollectDockOre", 10)
+local TokenRoll = Net and Net:WaitForChild("RequestTokenRoll", 10)
 
 local Config = {
 	AutoCollect = false,
@@ -21,6 +22,8 @@ local Config = {
 	SellDelay = 1,
 	AutoEventDrop = false,
 	EventDropScanDelay = 0.1,
+	AutoRollJellyFish = false,
+	RollDelay = 1,
 }
 
 local Window
@@ -127,6 +130,20 @@ task.spawn(function()
 end)
 
 -- ============================================================
+--  AUTO ROLL JELLY FISH
+-- ============================================================
+task.spawn(function()
+	while true do
+		task.wait(Config.RollDelay)
+		if Config.AutoRollJellyFish and TokenRoll then
+			pcall(function()
+				TokenRoll:FireServer({ machine = "JellyFish" })
+			end)
+		end
+	end
+end)
+
+-- ============================================================
 --  AUTO COLLECT DOCK ORE
 -- ============================================================
 task.spawn(function()
@@ -215,6 +232,25 @@ EventTab:CreateSlider({
 	CurrentValue = Config.EventDropScanDelay,
 	Flag = "EventDropScanDelay",
 	Callback = function(v) Config.EventDropScanDelay = v end,
+})
+
+EventTab:CreateSection("Jelly Fish Machine")
+EventTab:CreateToggle({
+	Name = "Auto Roll Jelly Fish",
+	Description = "Automatically rolls the Jelly Fish token machine",
+	Flag = "AutoRollJellyFish",
+	CurrentValue = Config.AutoRollJellyFish,
+	Callback = function(v) Config.AutoRollJellyFish = v end,
+})
+
+EventTab:CreateSlider({
+	Name = "Roll Delay",
+	Range = { 0.1, 5 },
+	Increment = 0.1,
+	Suffix = "s",
+	CurrentValue = Config.RollDelay,
+	Flag = "RollDelay",
+	Callback = function(v) Config.RollDelay = v end,
 })
 
 -- ── INFO TAB ─────────────────────────────────────────────
