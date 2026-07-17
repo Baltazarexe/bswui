@@ -26,9 +26,22 @@ local Config = {
 	RollDelay = 1,
 	AutoRollUFO = false,
 	UFORollDelay = 1,
+	AntiAFK = true,
 }
 
 local Window
+
+-- ============================================================
+--  ANTI AFK
+-- ============================================================
+local VirtualUser = game:GetService("VirtualUser")
+LocalPlayer.Idled:Connect(function()
+	if not Config.AntiAFK then return end
+	pcall(function()
+		VirtualUser:CaptureController()
+		VirtualUser:ClickButton2(Vector2.new())
+	end)
+end)
 
 -- ============================================================
 --  SELL PROMPT
@@ -296,6 +309,13 @@ InfoTab:CreateParagraph({
 })
 
 InfoTab:CreateSection("General")
+InfoTab:CreateToggle({
+	Name = "Anti AFK",
+	Flag = "AntiAFK",
+	CurrentValue = Config.AntiAFK,
+	Callback = function(v) Config.AntiAFK = v end,
+})
+
 InfoTab:CreateKeybind({
 	Name = "Menu Toggle Key",
 	CurrentKeybind = "K",
