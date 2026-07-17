@@ -19,8 +19,8 @@ local Config = {
 	TrainTickValue = 478,   -- captured live value; server doesn't appear to validate this strictly
 	TrainDelay = 0.5,       -- matches trainingIntervalSeconds from game data
 	AutoSkillcheck = false,
-	SkillcheckScore = 90,   -- 0-100, higher = better timed hit (captured real hits: 36, 38, 67)
-	SkillcheckDelay = 0.3,
+	SkillcheckScore = 90,   -- fallback-only: 0-100, used if getconnections isn't supported by the executor
+	SkillcheckDelay = 0.1,
 	AntiAFK = true,
 	HidePopups = false,
 }
@@ -45,18 +45,64 @@ task.spawn(function()
 end)
 
 -- ============================================================
---  AUTO SKILLCHECK (fires bonus + boost analytics together,
---  matching what happens when you actually click the purple target)
+--  AUTO SKILLCHECK
+--  The purple target is an invisible round TextButton (BackgroundTransparency=1,
+--  Text="", UICorner radius 0.5) whose Activated event runs the real hit logic
+--  (removes the circle, computes the score, fires the bonus + analytics remotes).
+--  We find that button and fire its Activated connections directly so it behaves
+--  exactly like a real click. If the executor doesn't support getconnections we
+--  fall back to firing the remotes blindly (works, but won't dismiss the circle).
 -- ============================================================
+local supportsGetConnections = typeof(getconnections) == "function"
+
+local function findSkillcheckButton()
+	local PlayerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+	if not PlayerGui then return nil end
+	for _, inst in ipairs(PlayerGui:GetDescendants()) do
+		if inst:IsA("TextButton") and inst.BackgroundTransparency == 1 and inst.Text == "" then
+			local corner = inst:FindFirstChildOfClass("UICorner")
+			if corner and corner.CornerRadius == UDim.new(0.5, 0) then
+				local size = inst.Size
+				if size.X.Offset > 50 and math.abs(size.X.Offset - size.Y.Offset) < 2 then
+					return inst
+				end
+			end
+		end
+	end
+	return nil
+end
+
+local function clickSkillcheckTarget()
+	local button = findSkillcheckButton()
+
+	if button and supportsGetConnections then
+		local ok, conns = pcall(getconnections, button.Activated)
+		if ok and conns and #conns > 0 then
+			for _, c in ipairs(conns) do
+				pcall(function() c:Fire() end)
+			end
+			return true
+		end
+	end
+
+	if button then
+		-- fallback: blind remote fire when we found the button but can't invoke it directly
+		pcall(function()
+			SkillcheckRemote:FireServer(Config.SkillcheckScore)
+			BoostButtonRemote:FireServer()
+		end)
+		return true
+	end
+
+	return false
+end
+
 task.spawn(function()
 	while true do
 		task.wait(Config.SkillcheckDelay)
 		if Config.AutoSkillcheck then
-			local ok = pcall(function()
-				SkillcheckRemote:FireServer(Config.SkillcheckScore)
-				BoostButtonRemote:FireServer()
-			end)
-			if ok then stats.skillchecks = stats.skillchecks + 1 end
+			local hit = clickSkillcheckTarget()
+			if hit then stats.skillchecks = stats.skillchecks + 1 end
 		end
 	end
 end)
@@ -179,8 +225,8 @@ MainTab:CreateToggle({
 })
 
 MainTab:CreateSlider({
-	Name = "Skillcheck Score",
-	Description = "Simulated hit accuracy (0-100)",
+	Name = "Skillcheck Score (fallback)",
+	Description = "Only used if your executor doesn't support getconnections",
 	Range = { 0, 100 },
 	Increment = 1,
 	CurrentValue = Config.SkillcheckScore,
@@ -189,9 +235,10 @@ MainTab:CreateSlider({
 })
 
 MainTab:CreateSlider({
-	Name = "Skillcheck Delay",
-	Range = { 0.1, 2 },
-	Increment = 0.1,
+	Name = "Skillcheck Check Rate",
+	Description = "How often to check for a target to hit",
+	Range = { 0.05, 1 },
+	Increment = 0.05,
 	Suffix = "s",
 	CurrentValue = Config.SkillcheckDelay,
 	Flag = "SkillcheckDelay",
