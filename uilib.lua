@@ -1056,7 +1056,7 @@ function Veil.CreateWindow(opts)
 				Parent = row,
 			})
 			local valueLabel = new("TextLabel", {
-				Text = tostring(value) .. suffix,
+				Text = string.format("%.2g", value) .. suffix,
 				Font = FONTS.Bold,
 				TextSize = 13,
 				BackgroundTransparency = 1,
