@@ -745,9 +745,6 @@ local Window = Veil.CreateWindow({
 
 -- ── MAIN TAB ─────────────────────────────────────────────
 local MainTab = Window:CreateTab("Main")
-MainTab:CreateSection("Status")
-MainTab:CreateLabel("Tycoon: " .. (MyTycoon and MyTycoon.Name or "DETECTING..."))
-
 MainTab:CreateButton({
 	Name = "Join Discord",
 	Description = "Copiar convite do Discord",
@@ -758,6 +755,9 @@ MainTab:CreateButton({
 		end
 	end,
 })
+
+MainTab:CreateSection("Status")
+MainTab:CreateLabel("Tycoon: " .. (MyTycoon and MyTycoon.Name or "DETECTING..."))
 
 MainTab:CreateSection("Gerais")
 MainTab:CreateToggle({
@@ -908,6 +908,6 @@ InfoTab:CreateParagraph({
 })
 
 InfoTab:CreateDivider()
-InfoTab:CreateLabel("v2.2 | VeilUI")
+InfoTab:CreateLabel("v2.2 | BSW UI")
 
 Window:Notify({ Title = "Carregado", Content = "BSW Lemon iniciado com sucesso.", Type = "Success" })
