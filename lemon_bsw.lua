@@ -39,8 +39,7 @@ local Config = {
 	AutoClickFruits = false,
 	ClickFruitsDelay = 0.3,
 	AutoRebirth = false,
-	RebirthMultiplier = 100,
-	RebirthTimes = 2,
+	RebirthMultiplier = 2,
 	RebirthDelay = 5.0,
 	AutoRejoin = false,
 }
@@ -555,20 +554,6 @@ local function getRebirthRemote()
 	return remotes:FindFirstChild("Rebirth")
 end
 
--- tycoon.Values.Rebirths mirrors TycoonRebirth:GetRebirths() server-side
-local function getRebirthsCount()
-	local tycoon = getTycoon()
-	if not tycoon then return nil end
-	local values = tycoon:FindFirstChild("Values")
-	if not values then return nil end
-	local v = values:FindFirstChild("Rebirths") or values:FindFirstChild("TotalRebirths")
-	if v then return v.Value end
-	return nil
-end
-
-local rebirthBaseline = nil
-local rebirthTarget = nil
-
 local function readInvestorContainer(container)
 	if not container then return nil end
 	for _, child in ipairs(container:GetDescendants()) do
@@ -628,38 +613,17 @@ local function getCurrentInvestors()
 end
 
 task.spawn(function()
-	local wasEnabled = false
 	while true do
 		task.wait(Config.RebirthDelay)
 		if Config.AutoRebirth then
-			-- capture starting rebirth count the moment the toggle turns on
-			if not wasEnabled then
-				rebirthBaseline = getRebirthsCount() or 0
-				rebirthTarget = rebirthBaseline + Config.RebirthTimes
-				wasEnabled = true
-			end
-
-			local currentRebirths = getRebirthsCount()
-			if currentRebirths and rebirthTarget and currentRebirths >= rebirthTarget then
-				Config.AutoRebirth = false
-				wasEnabled = false
-				Window:Notify({
-					Title = "Auto Rebirth",
-					Content = ("Target reached (%d rebirths). Stopped."):format(currentRebirths),
-					Type = "Success",
-				})
-			else
-				local ratio = getInvestorRatio()
-				if ratio and ratio >= Config.RebirthMultiplier then
-					local r = getRebirthRemote()
-					if r then
-						local ok = pcall(function() r:InvokeServer(nil) end)
-						if ok then stats.rebirths = stats.rebirths + 1 end
-					end
+			local ratio = getInvestorRatio()
+			if ratio and ratio >= Config.RebirthMultiplier then
+				local r = getRebirthRemote()
+				if r then
+					local ok = pcall(function() r:InvokeServer(nil) end)
+					if ok then stats.rebirths = stats.rebirths + 1 end
 				end
 			end
-		else
-			wasEnabled = false
 		end
 	end
 end)
@@ -916,26 +880,17 @@ local RebirthTab = Window:CreateTab("Rebirth")
 RebirthTab:CreateSection("Auto Rebirth")
 RebirthTab:CreateToggle({
 	Name = "Auto Rebirth",
-	Description = "Reads your current rebirth count and stops after +N more rebirths",
+	Description = "Rebirths automatically once the investor multiplier is reached",
 	Flag = "AutoRebirth",
 	CurrentValue = Config.AutoRebirth,
 	Callback = function(v) Config.AutoRebirth = v end,
 })
 
 RebirthTab:CreateSlider({
-	Name = "Rebirth Times",
-	Description = "How many rebirths to do before auto-stopping (min 2)",
-	Range = { 2, 50 },
-	Increment = 1,
-	CurrentValue = Config.RebirthTimes,
-	Flag = "RebirthTimes",
-	Callback = function(v) Config.RebirthTimes = v end,
-})
-
-RebirthTab:CreateSlider({
 	Name = "Rebirth Multiplier",
-	Range = { 10, 1000 },
-	Increment = 10,
+	Description = "Rebirth once potential investors are this many times your current investors",
+	Range = { 2, 10 },
+	Increment = 1,
 	CurrentValue = Config.RebirthMultiplier,
 	Flag = "RebirthMultiplier",
 	Callback = function(v) Config.RebirthMultiplier = v end,
