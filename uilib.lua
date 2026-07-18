@@ -164,6 +164,15 @@ local function tween(obj, props, time, style, dir)
 	return t
 end
 
+local function formatSliderValue(v)
+	if v == math.floor(v) then
+		return string.format("%d", v)
+	end
+	local s = string.format("%.4f", v)
+	s = s:gsub("0+$", ""):gsub("%.$", "")
+	return s
+end
+
 local function getGuiParent()
 	local ok, hui = pcall(function() return gethui and gethui() end)
 	if ok and hui then return hui end
@@ -1074,7 +1083,7 @@ function Veil.CreateWindow(opts)
 				Parent = row,
 			})
 			local valueLabel = new("TextLabel", {
-				Text = string.format("%.2g", value) .. suffix,
+				Text = formatSliderValue(value) .. suffix,
 				Font = FONTS.Bold,
 				TextSize = 13,
 				BackgroundTransparency = 1,
@@ -1125,7 +1134,7 @@ function Veil.CreateWindow(opts)
 				local frac = (value - min) / math.max(max - min, 1e-9)
 				fill.Size = UDim2.new(frac, 0, 1, 0)
 				knob.Position = UDim2.new(frac, 0, 0.5, 0)
-				valueLabel.Text = tostring(value) .. suffix
+				valueLabel.Text = formatSliderValue(value) .. suffix
 				Window:_setFlag(flag, value)
 				if fire and o.Callback then
 					local ok, err = pcall(o.Callback, value)
