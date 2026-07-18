@@ -23,6 +23,8 @@ local Config = {
 	AutoDropperCave = false,
 	AutoFireStone = false,
 	ClickDelay = 0.1,
+	AutoBuyAllUpgrades = false,
+	UpgradeLoopDelay = 1,
 	AntiAFK = true,
 }
 
@@ -154,6 +156,19 @@ local function buyMaxUpgrade(key)
 	return ok
 end
 
+task.spawn(function()
+	while true do
+		task.wait(Config.UpgradeLoopDelay)
+		if Config.AutoBuyAllUpgrades then
+			for _, upgrade in ipairs(UPGRADES) do
+				if not Config.AutoBuyAllUpgrades then break end
+				buyMaxUpgrade(upgrade.Key)
+				task.wait(0.1)
+			end
+		end
+	end
+end)
+
 -- ============================================================
 --  UI VEIL
 -- ============================================================
@@ -254,6 +269,26 @@ end
 
 -- ── UPGRADES TAB ─────────────────────────────────────────
 local UpgradesTab = Window:CreateTab("Upgrades")
+UpgradesTab:CreateSection("Auto Buy")
+UpgradesTab:CreateToggle({
+	Name = "Auto Buy All Upgrades",
+	Description = "Loops through every upgrade and buys it to max",
+	Flag = "AutoBuyAllUpgrades",
+	CurrentValue = Config.AutoBuyAllUpgrades,
+	Callback = function(v) Config.AutoBuyAllUpgrades = v end,
+})
+
+UpgradesTab:CreateSlider({
+	Name = "Loop Delay",
+	Description = "Delay between each full sweep of all upgrades",
+	Range = { 0.2, 5 },
+	Increment = 0.1,
+	Suffix = "s",
+	CurrentValue = Config.UpgradeLoopDelay,
+	Flag = "UpgradeLoopDelay",
+	Callback = function(v) Config.UpgradeLoopDelay = v end,
+})
+
 UpgradesTab:CreateSection("Max Upgrades")
 for _, upgrade in ipairs(UPGRADES) do
 	UpgradesTab:CreateButton({
