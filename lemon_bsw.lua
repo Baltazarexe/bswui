@@ -208,7 +208,7 @@ do
 		if n < 20 then
 			name = BASE[n]
 		else
-			name = PREFIX[n % 10] .. ROOT[n // 10]
+			name = PREFIX[n % 10] .. ROOT[math.floor(n / 10)]
 		end
 		if name and name ~= "" then
 			WORD_MULT[name] = 10 ^ ((n + 1) * 3)
@@ -637,11 +637,11 @@ local treeCacheDirty = true
 local function rebuildTreeCache()
 	treeCache = {}
 	for _, tycoon in ipairs(Workspace:GetChildren()) do
-		if not tycoon.Name:match("^Tycoon%d+$") then continue end
-		for _, desc in ipairs(tycoon:GetDescendants()) do
-			if not desc.Name:lower():find("tree") then continue end
-			if desc:FindFirstChild("Fruit") then
-				table.insert(treeCache, desc)
+		if tycoon.Name:match("^Tycoon%d+$") then
+			for _, desc in ipairs(tycoon:GetDescendants()) do
+				if desc.Name:lower():find("tree") and desc:FindFirstChild("Fruit") then
+					table.insert(treeCache, desc)
+				end
 			end
 		end
 	end
@@ -673,26 +673,26 @@ local function clickAllFruits()
 	local count = 0
 
 	for _, tree in ipairs(treeCache) do
-		if not tree or not tree.Parent then continue end
-		for _, fruit in ipairs(tree:GetChildren()) do
-			if not Config.AutoClickFruits then return count end
-			if fruit.Name ~= "Fruit" then continue end
-			local cp = fruit:FindFirstChild("ClickPart")
-			if not (cp and cp:IsA("BasePart")) then continue end
+		if tree and tree.Parent then
+			for _, fruit in ipairs(tree:GetChildren()) do
+				if not Config.AutoClickFruits then return count end
+				local cp = fruit.Name == "Fruit" and fruit:FindFirstChild("ClickPart")
+				if cp and cp:IsA("BasePart") then
+					root.CFrame = CFrame.new(cp.Position + Vector3.new(0, 2.5, 0))
+					task.wait(Config.ClickFruitsDelay)
 
-			root.CFrame = CFrame.new(cp.Position + Vector3.new(0, 2.5, 0))
-			task.wait(Config.ClickFruitsDelay)
-
-			if fti then
-				pcall(fti, root, cp, 0)
-				pcall(fti, root, cp, 1)
+					if fti then
+						pcall(fti, root, cp, 0)
+						pcall(fti, root, cp, 1)
+					end
+					if fcd then
+						local cd = cp:FindFirstChildWhichIsA("ClickDetector")
+						if cd then pcall(fcd, cd) end
+					end
+					count = count + 1
+					stats.fruits = stats.fruits + 1
+				end
 			end
-			if fcd then
-				local cd = cp:FindFirstChildWhichIsA("ClickDetector")
-				if cd then pcall(fcd, cd) end
-			end
-			count = count + 1
-			stats.fruits = stats.fruits + 1
 		end
 	end
 
