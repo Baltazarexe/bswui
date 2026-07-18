@@ -256,6 +256,14 @@ MainTab:CreateKeybind({
 })
 
 MainTab:CreateToggle({
+	Name = "Hide Name",
+	Description = "Hides your display name/username in the sidebar",
+	Flag = "HideNameToggle",
+	CurrentValue = false,
+	Callback = function(v) Window:SetNameHidden(v) end,
+})
+
+MainTab:CreateToggle({
 	Name = "Hide Popups",
 	Description = "Hides the +Power flytext, SPIN wheel and x2 target icon",
 	Flag = "HidePopups",
