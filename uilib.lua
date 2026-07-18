@@ -1171,6 +1171,13 @@ function Veil.CreateWindow(opts)
 			end
 			function Slider:Get() return value end
 
+			if o.Callback then
+				task.spawn(function()
+					local ok, err = pcall(o.Callback, value)
+					if not ok then warn("[VeilUI] slider init error: " .. tostring(err)) end
+				end)
+			end
+
 			return Slider
 		end
 
@@ -1214,6 +1221,14 @@ function Veil.CreateWindow(opts)
 			local Input = {}
 			function Input:Set(v) box.Text = tostring(v) end
 			function Input:Get() return box.Text end
+
+			if o.Callback then
+				task.spawn(function()
+					local ok, err = pcall(o.Callback, box.Text)
+					if not ok then warn("[VeilUI] input init error: " .. tostring(err)) end
+				end)
+			end
+
 			return Input
 		end
 
@@ -1392,6 +1407,13 @@ function Veil.CreateWindow(opts)
 				return multi and names or names[1]
 			end
 
+			if o.Callback then
+				task.spawn(function()
+					local ok, err = pcall(o.Callback, Dropdown:Get())
+					if not ok then warn("[VeilUI] dropdown init error: " .. tostring(err)) end
+				end)
+			end
+
 			return Dropdown
 		end
 
@@ -1443,6 +1465,13 @@ function Veil.CreateWindow(opts)
 
 			function Keybind:Get() return current end
 			function Keybind:Set(v) current = v; keyBtn.Text = v end
+
+			if o.Callback then
+				task.spawn(function()
+					local ok, err = pcall(o.Callback, current)
+					if not ok then warn("[VeilUI] keybind init error: " .. tostring(err)) end
+				end)
+			end
 
 			return Keybind
 		end
@@ -1572,6 +1601,13 @@ function Veil.CreateWindow(opts)
 
 			function ColorPicker:Get() return color end
 			function ColorPicker:Set(c) color = c; swatch.BackgroundColor3 = c end
+
+			if o.Callback then
+				task.spawn(function()
+					local ok, err = pcall(o.Callback, color)
+					if not ok then warn("[VeilUI] color picker init error: " .. tostring(err)) end
+				end)
+			end
 
 			return ColorPicker
 		end
