@@ -19,6 +19,7 @@ local BASE_URL = "https://raw.githubusercontent.com/Baltazarexe/bswui/main/"
 local GAME_MAP = {
 	[79268393072444] = "lemon_bsw",      -- Lemon Tycoon
 	[121125129560252] = "mineworld_bsw", -- Mine World
+	[93445850351820] = "ore_bsw",        -- Ore Incremental
 	-- add more games here
 }
 
